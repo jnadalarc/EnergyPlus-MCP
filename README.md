@@ -8,7 +8,7 @@ A Model Context Protocol (MCP) server that provides **35 comprehensive tools** o
 
 ## What is this repo about?
 
-This repository contains an MCP server specifically designed for EnergyPlus building energy simulation workflows. EnergyPlus is a powerful building energy simulation engine developed by the U.S. Department of Energy, and this MCP server makes it accessible to AI assistants and automation tools.
+This repository contains an MCP server specifically designed for EnergyPlus building energy simulation workflows. EnergyPlus is a powerful building energy simulation engine, and this MCP server makes it accessible to AI assistants and automation tools.
 
 **Key Features:**
 - **🏗️ Complete Model Lifecycle**: Load, validate, analyze, modify, and simulate EnergyPlus IDF files
