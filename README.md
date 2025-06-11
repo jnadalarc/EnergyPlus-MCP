@@ -785,4 +785,4 @@ Set `debug_mode: true` in configuration or use environment variable to enable ve
 
 ## License
 
-BSD License - see LICENSE file for details.
+See [LICENSE](License.txt) file for details.
