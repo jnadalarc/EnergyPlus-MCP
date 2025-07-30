@@ -11,10 +11,14 @@ A Model Context Protocol (MCP) server that provides **35 comprehensive tools** f
 
 - [Overview](#overview)
 - [Installation](#installation)
-  - [Claude Desktop Setup](#claude-desktop-setup)
-  - [VS Code Dev Container](#vs-code-dev-container)
-  - [Docker Setup](#docker-setup)
-  - [Local Development](#local-development)
+  - [Using the MCP Server](#using-the-mcp-server)
+    - [Claude Desktop](#claude-desktop)
+    - [VS Code](#vs-code)
+    - [Cursor](#cursor)
+  - [Development Setup](#development-setup)
+    - [VS Code Dev Container](#vs-code-dev-container)
+    - [Docker Setup](#docker-setup)
+    - [Local Development](#local-development)
 - [Available Tools](#available-tools)
 - [Usage Examples](#usage-examples)
 - [Architecture](#architecture)
@@ -39,7 +43,11 @@ EnergyPlus MCP Server makes EnergyPlus building energy simulation accessible to 
 
 ## Installation
 
-### Claude Desktop Setup
+### Using the MCP Server
+
+Choose the appropriate setup for your AI assistant or IDE:
+
+#### Claude Desktop
 
 1. **Build the Docker image** (one-time setup):
    ```bash
@@ -76,7 +84,73 @@ EnergyPlus MCP Server makes EnergyPlus building energy simulation accessible to 
 
 3. **Restart Claude Desktop** and the EnergyPlus server should connect automatically.
 
-### VS Code Dev Container
+#### VS Code
+
+1. **Build the Docker image** (same as Claude Desktop step 1 above)
+
+2. **Configure VS Code**:
+   
+   Add to `.vscode/settings.json` in your project:
+   ```json
+   {
+     "mcp.servers": {
+       "energyplus": {              // Server name shown in VS Code
+         "command": "docker",         // Main command to execute  
+         "args": [
+           "run",                     // Docker subcommand to run a container
+           "--rm",                    // Remove container after it exits (cleanup)
+           "-i",                      // Interactive mode for stdio communication
+           "-v", "${workspaceFolder}:/workspace",      // Mount workspace to container
+           "-w", "/workspace/energyplus-mcp-server",    // Working dir in container
+           "energyplus-mcp-dev",      // Docker image name we built
+           "uv", "run", "python", "-m", "energyplus_mcp_server.server"  // Server startup command
+         ]
+       }
+     }
+   }
+   ```
+   
+   **Important**: Remove all comments (text after `//`) when adding to the actual config file
+
+3. **Restart VS Code** for the changes to take effect.
+
+#### Cursor
+
+1. **Build the Docker image** (same as Claude Desktop step 1 above)
+
+2. **Configure Cursor**:
+   
+   Add to `~/.cursor/mcp.json`:
+   ```json
+   {
+     "mcpServers": {
+       "energyplus": {              // Server name shown in Cursor
+         "command": "docker",         // Main command to execute
+         "args": [
+           "run",                     // Docker subcommand to run a container
+           "--rm",                    // Remove container after it exits (cleanup)
+           "-i",                      // Interactive mode for stdio communication
+           "-v", "/path/to/EnergyPlus-MCP:/workspace",  // Mount local dir to container
+           "-w", "/workspace/energyplus-mcp-server",    // Working dir in container
+           "energyplus-mcp-dev",      // Docker image name we built
+           "uv", "run", "python", "-m", "energyplus_mcp_server.server"  // Server startup command
+         ]
+       }
+     }
+   }
+   ```
+   
+   **Important**: 
+   - Replace `/path/to/EnergyPlus-MCP` with your actual repository path
+   - Remove all comments (text after `//`) when adding to the actual config file, as JSON doesn't support comments
+
+3. **Restart Cursor** for the changes to take effect.
+
+### Development Setup
+
+For contributors who want to modify or extend the MCP server:
+
+#### VS Code Dev Container
 
 The easiest development setup with all dependencies pre-configured.
 
@@ -97,9 +171,9 @@ The easiest development setup with all dependencies pre-configured.
 
 3. The container automatically installs EnergyPlus 25.1.0 and all dependencies
 
-### Docker Setup
+#### Docker Setup
 
-For direct Docker usage without VS Code:
+For direct Docker development without VS Code:
 
 ```bash
 # Clone repository
@@ -116,9 +190,9 @@ docker run -it --rm -v "$(pwd)":/workspace -w /workspace/energyplus-mcp-server e
 uv sync --extra dev
 ```
 
-### Local Development
+#### Local Development
 
-For local installation (requires EnergyPlus installation):
+For local development (requires EnergyPlus installation):
 
 **Prerequisites:**
 - Python 3.10+
@@ -131,7 +205,7 @@ git clone https://github.com/tsbyq/EnergyPlus_MCP.git
 cd EnergyPlus_MCP/energyplus-mcp-server
 uv sync --extra dev
 
-# Run server
+# Run server for testing
 uv run python -m energyplus_mcp_server.server
 ```
 
