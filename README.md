@@ -6,7 +6,7 @@ A Model Context Protocol (MCP) server that provides **35 comprehensive tools** f
 > **EnergyPlus Compatibility**: 25.1.0  
 > **Python**: 3.10+
 
-<details>
+<details open>
 <summary><h2>📑 Table of Contents</h2></summary>
 
 - [Overview](#overview)
