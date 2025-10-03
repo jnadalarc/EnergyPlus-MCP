@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_NAME}
+spec:
+  selector:
+    matchLabels:
+      app: ${APP_NAME}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}
+    spec:
+      containers:
+        - image: ${IMAGE}
+          imagePullPolicy: Always
+          name: ${APP_NAME}
+          ports:
+            - containerPort: ${APP_PORT}
+              name: ${APP_PORT}tcp
+              protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /auth
+              name: auth
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: registry-wattega-auth
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: auth
+          secret:
+            defaultMode: 420
+            secretName: registry-auth-secret
+
