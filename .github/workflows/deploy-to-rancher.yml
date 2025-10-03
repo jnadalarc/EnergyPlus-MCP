@@ -6,8 +6,8 @@ on:
       - main
 
 env:
-  IMAGE_TAG: registry.wattega.com/hibrid-e/boiler-inertia-api:latest
-  APP_NAME: boiler-inertia-api
+  IMAGE_TAG: registry.wattega.com/test/energyplus-mcp-server:latest
+  APP_NAME: energyplus-mcp-server
   APP_PORT: 8000 # must be the same exposed in Dockerfile
 
 jobs:
