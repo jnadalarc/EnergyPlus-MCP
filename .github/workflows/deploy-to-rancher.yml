@@ -44,7 +44,7 @@ jobs:
   deploy:
     name: Deploy to Rancher
     needs: build-and-push # Aquesta feina depèn de l'anterior
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Instal·lar la CLI de Rancher
