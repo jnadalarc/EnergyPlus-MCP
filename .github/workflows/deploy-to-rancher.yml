@@ -1,0 +1,62 @@
+# .github/workflows/deploy-to-rancher.yml
+
+name: CI/CD - Build and Deploy to Rancher
+
+# Aquesta acció s'executa quan fas 'push' a la branca 'main'
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # !!! IMPORTANT: Canvia 'jnadalarc' pel teu nom d'usuari de GitHub
+  IMAGE_NAME: ghcr.io/jnadalarc/energyplus-mcp-server
+
+jobs:
+  # Feina 1: Construir la imatge i pujar-la al registre de contenidors de GitHub (ghcr.io)
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Donem permís per escriure al registre de paquets
+
+    steps:
+      - name: Checkout del codi
+        uses: actions/checkout@v4
+
+      - name: Iniciar sessió a GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # Secret automàtic que proporciona GitHub
+
+      - name: Construir i pujar la imatge de Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: .devcontainer/Dockerfile # Ruta al Dockerfile del projecte
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  # Feina 2: Desplegar la nova imatge a Rancher
+  deploy:
+    name: Deploy to Rancher
+    needs: build-and-push # Aquesta feina depèn de l'anterior
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Instal·lar la CLI de Rancher
+        run: |
+          curl -sL https://github.com/rancher/cli/releases/download/v2.6.5/rancher-linux-amd64-v2.6.5.tar.gz | tar zx
+          sudo mv rancher-*/rancher /usr/local/bin/
+
+      - name: Redesplegar el workload a Rancher
+        run: |
+          # Iniciem sessió a Rancher utilitzant els secrets
+          rancher login ${{ secrets.RANCHER_URL }} -t ${{ secrets.RANCHER_ACCESS_KEY }}:${{ secrets.RANCHER_SECRET_KEY }} --skip-verify
+
+          # Forcem que el 'deployment' es reiniciï per agafar la nova imatge :latest
+          # El nom 'energyplus-server' ha de coincidir amb el del teu workload
+          rancher kubectl rollout restart deployment/energyplus-server
